@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: studyapplication
+
+  cloud:
+    config:
+      uri: http://localhost:9090
+
