@@ -1,0 +1,14 @@
+server:
+  port: 8085
+
+spring:
+  profiles:
+    active: production
+
+notificador:
+  email:
+    host:
+      servidor:
+        url: smtp.teste.com.br
+        porta: 25
+
