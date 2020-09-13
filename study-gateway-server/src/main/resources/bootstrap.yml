@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: studymicroservices-gateway-server
+
+  cloud:
+    config:
+      uri: http://localhost:9090
