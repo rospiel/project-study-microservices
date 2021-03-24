@@ -73,6 +73,6 @@ public class StateService {
 
     public State findById(Long stateId) {
         return stateRepository.findById(stateId).orElseThrow(()
-                -> new UnprocessableEntityException(format("State of id %s not found.", stateId)));
+                -> new UnprocessableEntityException("State of id %s not found.", stateId));
     }
 }

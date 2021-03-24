@@ -63,7 +63,7 @@ public class KitchenService {
 
     private Kitchen findById(Long kitchenId) {
         return kitchenRepository.findById(kitchenId).orElseThrow(()
-                -> new UnprocessableEntityException(format("Kitchen of id %s not found.", kitchenId)));
+                -> new UnprocessableEntityException("Kitchen of id %s not found.", kitchenId));
     }
 
     private List<KitchenDto> convertEntityToDto(List<Kitchen> kitchens) {

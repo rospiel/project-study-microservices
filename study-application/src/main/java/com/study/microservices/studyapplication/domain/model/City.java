@@ -33,6 +33,11 @@ public class City {
 
     @ManyToOne
     @JoinColumn(name = "state_id")
-    @NonNull
     private State state;
+
+    public City(Long id, String name, State state) {
+        this.id = id;
+        this.name = name;
+        this.state = state;
+    }
 }

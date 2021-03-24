@@ -81,7 +81,7 @@ public class RestaurantService {
 
     private Restaurant findById(Long restaurantId) {
         Supplier<UnprocessableEntityException> unprocessableEntitySupplier = ()
-                -> new UnprocessableEntityException(format("Restaurant of id %s not found.", restaurantId));
+                -> new UnprocessableEntityException("Restaurant of id %s not found.", restaurantId);
         return ofNullable(restaurantRepository.findById(restaurantId)).orElseThrow(unprocessableEntitySupplier).get();
     }
 

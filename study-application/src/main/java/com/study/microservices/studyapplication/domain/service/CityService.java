@@ -1,6 +1,7 @@
 package com.study.microservices.studyapplication.domain.service;
 
 import com.study.microservices.studyapplication.domain.dto.CityDto;
+import com.study.microservices.studyapplication.domain.exception.EntityAlreadyInUseException;
 import com.study.microservices.studyapplication.domain.exception.UnprocessableEntityException;
 import com.study.microservices.studyapplication.domain.model.City;
 import com.study.microservices.studyapplication.domain.model.State;
@@ -10,8 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 import static java.lang.String.format;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 
@@ -36,7 +39,7 @@ public class CityService {
     }
 
     public CityDto update(CityDto cityDto, Long cityId) {
-        if (nonNull(cityDto.getState())) {
+        if (nonNull(cityDto.getState()) && nonNull(cityDto.getState().getId())) {
             stateService.findById(cityDto.getState().getId());
         }
 
@@ -46,13 +49,25 @@ public class CityService {
     }
 
     public void delete(Long cityId) {
+        City city = this.findById(cityId);
+        if (nonNull(city.getState())) {
+            String MESSAGE_ERROR = "There is a state associate to the city of id.: %s";
+            throw new EntityAlreadyInUseException(MESSAGE_ERROR, city.getState().getId());
+        }
+
         cityRepository.deleteById(cityId);
     }
 
     private void updateObjectCity(CityDto cityUpdate, City cityActual) {
         cityActual.setName(nonNull(cityUpdate.getName()) ? cityUpdate.getName() : cityActual.getName());
-        cityActual.setState(nonNull(cityUpdate.getState()) && nonNull(cityUpdate.getState().getId())
-                ? new State(cityUpdate.getState().getId(), null) : cityActual.getState());
+
+        if (nonNull(cityUpdate.getState()) && nonNull(cityUpdate.getState().getId())) {
+            cityActual.setState(new State(cityUpdate.getState().getId(), null));
+            return;
+        }
+
+        cityActual.setState(nonNull(cityUpdate.getState()) && isNull(cityUpdate.getState().getId())
+                ? null : cityActual.getState());
     }
 
     private List<CityDto> convertEntityToDto(List<City> cities) {
@@ -69,12 +84,12 @@ public class CityService {
 
     private City convertDtoToEntity(CityDto cityDto) {
         return nonNull(cityDto) ?
-                new City(cityDto.getName(), StateService.convertDtoToEntity(cityDto.getState())) :
+                new City(cityDto.getId(), cityDto.getName(), StateService.convertDtoToEntity(cityDto.getState())) :
                 null;
     }
 
     private City findById(Long cityId) {
         return cityRepository.findById(cityId).orElseThrow(() ->
-                new UnprocessableEntityException(format("City of name %s not found.", cityId)));
+                new UnprocessableEntityException("City of name %s not found.", cityId));
     }
 }

@@ -70,11 +70,11 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- allowing xml to return on the response -->
+		<!-- allowing xml to return on the response
 		<dependency>
 			<groupId>com.fasterxml.jackson.dataformat</groupId>
 			<artifactId>jackson-dataformat-xml</artifactId>
-		</dependency>
+		</dependency> -->
 
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -87,6 +87,12 @@
 			<artifactId>h2</artifactId>
 			<version>1.4.200</version>
 			<scope>test</scope>
+		</dependency>
+
+		<!-- Will help providing some method to improve our error handle -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
 		</dependency>
 
 
