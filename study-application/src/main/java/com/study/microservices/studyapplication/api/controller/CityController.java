@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;
@@ -41,13 +42,13 @@ public class CityController {
 
     @PostMapping
     @ResponseStatus(CREATED)
-    public void include(@RequestBody CityDto cityDto) {
+    public void include(@RequestBody @Valid CityDto cityDto) {
         cityService.save(cityDto);
     }
 
     @PutMapping(BY_ID)
     @ResponseStatus(NO_CONTENT)
-    public void update(@RequestBody CityDto cityDto, @PathVariable Long cityId) {
+    public void update(@RequestBody @Valid CityDto cityDto, @PathVariable Long cityId) {
         cityService.update(cityDto, cityId);
     }
 

@@ -73,4 +73,10 @@ public class  Restaurant {
     public Restaurant(Long id) {
         this.id = id;
     }
+
+    public Restaurant(String name, BigDecimal freightRate, Kitchen kitchen) {
+        this.name = name;
+        this.freightRate = freightRate;
+        this.kitchen = kitchen;
+    }
 }

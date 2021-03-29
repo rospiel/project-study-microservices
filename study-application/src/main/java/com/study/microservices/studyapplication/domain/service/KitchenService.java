@@ -30,14 +30,14 @@ public class KitchenService {
     @Autowired
     private RestaurantService restaurantService;
 
-    public Kitchen save(Kitchen kitchen) {
-        return kitchenRepository.save(kitchen);
+    public Kitchen save(KitchenDto kitchen) {
+        return kitchenRepository.save(convertDtoToEntity(kitchen));
     }
 
-    public Kitchen update(Kitchen kitchen, Long kitchenId) {
+    public Kitchen update(KitchenDto kitchen, Long kitchenId) {
         Kitchen kitchenBase = kitchenRepository.findById(kitchenId).orElseThrow(() -> new EmptyResultDataAccessException(kitchenId.intValue()));
         copyProperties(kitchen, kitchenBase, "id");
-        return this.save(kitchenBase);
+        return kitchenRepository.save(kitchenBase);
     }
 
     public void delete(Long kitchenId) {
@@ -76,5 +76,11 @@ public class KitchenService {
         return nonNull(kitchen) ?
                 new KitchenDto(kitchen.getId(), kitchen.getName()) :
                 null;
+    }
+
+    public static Kitchen convertDtoToEntity(KitchenDto kitchenDto) {
+        return nonNull(kitchenDto) ?
+                new Kitchen(kitchenDto.getId(), kitchenDto.getName()) : null;
+
     }
 }

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import javax.validation.Valid;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.OK;
@@ -57,13 +58,13 @@ public class KitchenController {
 
     @ResponseStatus(CREATED)
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
-    public void include(@RequestBody Kitchen kitchen) {
+    public void include(@RequestBody @Valid KitchenDto kitchen) {
         kitchenService.save(kitchen);
     }
 
     @PutMapping(value = BY_ID, consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(NO_CONTENT)
-    public void update(@RequestBody Kitchen kitchen, @PathVariable Long kitchenId) {
+    public void update(@RequestBody @Valid KitchenDto kitchen, @PathVariable Long kitchenId) {
         kitchenService.update(kitchen, kitchenId);
     }
 

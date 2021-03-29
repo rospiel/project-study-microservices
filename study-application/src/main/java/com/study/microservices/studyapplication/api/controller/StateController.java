@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.OK;
@@ -44,13 +45,13 @@ public class StateController {
 
     @PostMapping
     @ResponseStatus(CREATED)
-    public void include(@RequestBody StateDto stateDto) {
+    public void include(@RequestBody @Valid StateDto stateDto) {
         stateService.save(stateDto);
     }
 
     @PutMapping(BY_ID)
     @ResponseStatus(NO_CONTENT)
-    public void update(@RequestBody StateDto stateDto, @PathVariable Long stateId) {
+    public void update(@RequestBody @Valid StateDto stateDto, @PathVariable Long stateId) {
         stateService.update(stateDto, stateId);
     }
 

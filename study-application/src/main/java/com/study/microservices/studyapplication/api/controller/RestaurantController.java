@@ -1,7 +1,6 @@
 package com.study.microservices.studyapplication.api.controller;
 
 import com.study.microservices.studyapplication.domain.dto.RestaurantDto;
-import com.study.microservices.studyapplication.domain.model.Restaurant;
 import com.study.microservices.studyapplication.domain.service.RestaurantService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -55,13 +55,13 @@ public class RestaurantController {
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(CREATED)
-    public void include(@RequestBody Restaurant restaurant) {
+    public void include(@RequestBody @Valid RestaurantDto restaurant) {
         restaurantService.save(restaurant);
     }
 
     @PutMapping(value = BY_ID, consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(NO_CONTENT)
-    public void update(@RequestBody Restaurant restaurant, @PathVariable Long restaurantId) {
+    public void update(@RequestBody @Valid RestaurantDto restaurant, @PathVariable Long restaurantId) {
         restaurantService.update(restaurant, restaurantId);
     }
 

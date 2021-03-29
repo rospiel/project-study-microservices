@@ -31,4 +31,8 @@ public class Kitchen {
     @Column
     private String name;
 
+    public Kitchen(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 }

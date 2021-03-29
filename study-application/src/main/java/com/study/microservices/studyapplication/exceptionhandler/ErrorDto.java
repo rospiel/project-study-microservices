@@ -6,8 +6,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static java.time.LocalDateTime.now;
 
 @JsonInclude(NON_NULL) /* this way we remove every property nullable from response */
 @Getter
@@ -18,6 +20,13 @@ public class ErrorDto {
     private String type;
     private String title;
     private String detail;
-    private LocalDateTime dateTime;
+
+    /* To use in bean validations  */
+    private List<FieldErrorDto> fields;
+    private String userMessage;
+
+    @Builder.Default
+    private LocalDateTime dateTime = now();
+
 
 }

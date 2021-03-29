@@ -5,9 +5,12 @@ import com.study.microservices.studyapplication.domain.exception.UnprocessableEn
 import com.study.microservices.studyapplication.domain.model.Kitchen;
 import com.study.microservices.studyapplication.domain.model.Restaurant;
 import com.study.microservices.studyapplication.domain.repository.RestaurantRepository;
+import com.study.microservices.studyapplication.core.validation.ValidationException;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.SmartValidator;
 
 import java.math.BigDecimal;
 import java.util.LinkedHashMap;
@@ -28,6 +31,7 @@ public class RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
     private final KitchenService kitchenService;
+    private final SmartValidator smartValidator;
 
     public List<RestaurantDto> findAll() {
         return convertEntityToDto(restaurantRepository.findAll());
@@ -37,12 +41,12 @@ public class RestaurantService {
         return convertEntityToDto(findById(restaurantId));
     }
 
-    public RestaurantDto save(Restaurant restaurant) {
+    public RestaurantDto save(RestaurantDto restaurant) {
         kitchenService.searchById(restaurant.getKitchen().getId());
-        return convertEntityToDto(restaurantRepository.save(restaurant));
+        return convertEntityToDto(restaurantRepository.save(convertDtoToEntity(restaurant)));
     }
 
-    public RestaurantDto update(Restaurant restaurant, Long restaurantId) {
+    public RestaurantDto update(RestaurantDto restaurant, Long restaurantId) {
         if (nonNull(restaurant.getKitchen())) {
             kitchenService.searchById(restaurant.getKitchen().getId());
         }
@@ -63,7 +67,8 @@ public class RestaurantService {
                 });
 
         Restaurant restaurantActual = this.findById(restaurantId);
-        EntityMergeService.getInstance(Restaurant.class, fields).mergeObject(restaurantActual);
+        EntityMergeService.getInstance(Restaurant.class).mergeObject(restaurantActual, fields);
+        validatePartialUpdate(convertEntityToDto(restaurantActual));
         return convertEntityToDto(restaurantRepository.save(restaurantActual));
     }
 
@@ -79,13 +84,22 @@ public class RestaurantService {
         return of(convertEntityToDto(restaurantRepository.findAllByKitchen(kitchenId)));
     }
 
+    private void validatePartialUpdate(RestaurantDto restaurantActual) {
+        BeanPropertyBindingResult result = new BeanPropertyBindingResult(restaurantActual, "restaurant");
+        smartValidator.validate(restaurantActual, result);
+
+        if (result.hasErrors()) {
+            throw new ValidationException(result);
+        }
+    }
+
     private Restaurant findById(Long restaurantId) {
         Supplier<UnprocessableEntityException> unprocessableEntitySupplier = ()
                 -> new UnprocessableEntityException("Restaurant of id %s not found.", restaurantId);
         return ofNullable(restaurantRepository.findById(restaurantId)).orElseThrow(unprocessableEntitySupplier).get();
     }
 
-    private void updateObjectRestaurant(Restaurant restaurantUpdated, Restaurant restaurantActual) {
+    private void updateObjectRestaurant(RestaurantDto restaurantUpdated, Restaurant restaurantActual) {
         restaurantActual.setName(nonNull(restaurantUpdated.getName()) ? restaurantUpdated.getName() : restaurantActual.getName());
         restaurantActual.setFreightRate(nonNull(restaurantUpdated.getFreightRate()) ? restaurantUpdated.getFreightRate() : restaurantActual.getFreightRate());
         restaurantActual.setKitchen(nonNull(restaurantUpdated.getKitchen()) && nonNull(restaurantUpdated.getKitchen().getId())
@@ -104,5 +118,12 @@ public class RestaurantService {
                         restaurant.getName(),
                         restaurant.getFreightRate(),
                         KitchenService.convertEntityToDto(restaurant.getKitchen())) : null;
+    }
+
+    public static Restaurant convertDtoToEntity(RestaurantDto restaurantDto) {
+        return nonNull(restaurantDto) ?
+                new Restaurant(restaurantDto.getName(), restaurantDto.getFreightRate(),
+                        KitchenService.convertDtoToEntity(restaurantDto.getKitchen())) : null;
+
     }
 }

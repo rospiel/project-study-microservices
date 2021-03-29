@@ -9,7 +9,8 @@ public enum ProblemType {
 
     ENTITY_ALREADY_IN_USE("Entity already in use", "entity-already-in-use"),
     ENTITY_CANNOT_BE_PROCESSED("Entity cannot be processed", "entity-cannot-be-processed"),
-    UNREADABLE_BODY("Unreadable body", "unreadable_body");
+    UNREADABLE_BODY("Unreadable body", "unreadable_body"),
+    INVALIDATED_PROPERTY("Invalidated property", "invalidated_property");
 
     private String title;
     private String uri;

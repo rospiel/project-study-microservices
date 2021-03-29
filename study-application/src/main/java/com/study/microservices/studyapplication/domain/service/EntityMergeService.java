@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES;
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static lombok.AccessLevel.PRIVATE;
@@ -34,32 +36,39 @@ public final class EntityMergeService {
     @NonNull
     private Class classType;
 
-    @NonNull
-    private Map<String, Object> fields;
-
-    public static EntityMergeService getInstance(Class classType, Map<String, Object> fields) {
+    public static EntityMergeService getInstance(Class classType) {
         if (isCached) {
             Optional<Map.Entry<Object, EntityMergeService>> entityMergeService = getFromCache(classType);
             if (FALSE.equals(entityMergeService.isPresent())) {
-                cacheEntityMergeServices.put(classType, new EntityMergeService(classType, fields));
+                cacheEntityMergeServices.put(classType, new EntityMergeService(classType));
             }
             return cacheEntityMergeServices.get(classType);
         }
 
-        return new EntityMergeService(classType, fields);
+        return new EntityMergeService(classType);
     }
 
-    public void mergeObject(Object objectActual) {
+    public void mergeObject(Object objectActual, Map<String, Object> fields) {
         if (isEmpty(fields)) {
             return;
         }
 
-        Object objectConverted = new ObjectMapper().convertValue(fields, classType);
-        fields.forEach((fieldName, fieldValue) -> {
-            Field field = findField(classType, fieldName);
-            field.setAccessible(TRUE); /* for private fields*/
-            setField(field, objectActual, getField(field, objectConverted));
-        });
+        ObjectMapper objectMapper = new ObjectMapper();
+        /* Not accept with the properties are annotated to ignore */
+        objectMapper.configure(FAIL_ON_IGNORED_PROPERTIES, TRUE);
+        objectMapper.configure(FAIL_ON_UNKNOWN_PROPERTIES, TRUE);
+
+        try {
+            Object objectConverted = objectMapper.convertValue(fields, classType);
+
+            fields.forEach((fieldName, fieldValue) -> {
+                Field field = findField(classType, fieldName);
+                field.setAccessible(TRUE); /* for private fields*/
+                setField(field, objectActual, getField(field, objectConverted));
+            });
+        } catch (IllegalArgumentException error) {
+            throw error;
+        }
     }
 
     private static Optional<Map.Entry<Object, EntityMergeService>> getFromCache(final Class classType) {
