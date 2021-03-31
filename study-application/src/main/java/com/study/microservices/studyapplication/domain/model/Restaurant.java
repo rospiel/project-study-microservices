@@ -16,6 +16,9 @@ import javax.persistence.ManyToMany;
 import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.Embedded;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -40,14 +43,17 @@ public class  Restaurant {
 
     /* by default the length is 255*/
     @Column(nullable = false)
+    @NotBlank
     private String name;
 
     /* by default the length is 255*/
     @Column
+    @DecimalMin(value = "0")
     private BigDecimal freightRate;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "kitchen_id", nullable = false)
+    @NotNull
     private Kitchen kitchen;
 
     @ManyToMany

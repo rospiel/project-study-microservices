@@ -6,6 +6,7 @@ import com.study.microservices.studyapplication.core.validation.ZeroFreightRateM
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import javax.validation.Valid;
 import javax.validation.constraints.DecimalMin;
@@ -25,6 +26,7 @@ import java.math.BigDecimal;
         restaurantName = "name", mandatoryDescription = "free delivery")
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class RestaurantDto {
 

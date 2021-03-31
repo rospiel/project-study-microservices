@@ -30,8 +30,8 @@ public class KitchenService {
     @Autowired
     private RestaurantService restaurantService;
 
-    public Kitchen save(KitchenDto kitchen) {
-        return kitchenRepository.save(convertDtoToEntity(kitchen));
+    public KitchenDto save(KitchenDto kitchen) {
+        return convertEntityToDto(kitchenRepository.save(convertDtoToEntity(kitchen)));
     }
 
     public Kitchen update(KitchenDto kitchen, Long kitchenId) {

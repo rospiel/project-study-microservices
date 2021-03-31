@@ -76,10 +76,6 @@ public class RestaurantService {
         return convertEntityToDto(restaurantRepository.searchByFreeShippingAndName(name));
     }
 
-    public RestaurantDto searchFirst() {
-        return convertEntityToDto(restaurantRepository.findFirst().orElse(new Restaurant()));
-    }
-
     public Optional<List<RestaurantDto>> searchByKitchen(Long kitchenId) {
         return of(convertEntityToDto(restaurantRepository.findAllByKitchen(kitchenId)));
     }
@@ -103,7 +99,7 @@ public class RestaurantService {
         restaurantActual.setName(nonNull(restaurantUpdated.getName()) ? restaurantUpdated.getName() : restaurantActual.getName());
         restaurantActual.setFreightRate(nonNull(restaurantUpdated.getFreightRate()) ? restaurantUpdated.getFreightRate() : restaurantActual.getFreightRate());
         restaurantActual.setKitchen(nonNull(restaurantUpdated.getKitchen()) && nonNull(restaurantUpdated.getKitchen().getId())
-                ? new Kitchen(restaurantUpdated.getKitchen().getId()) : restaurantActual.getKitchen());
+                ? new Kitchen(restaurantUpdated.getKitchen().getId(), null) : restaurantActual.getKitchen());
     }
 
     private List<RestaurantDto> convertEntityToDto(List<Restaurant> restaurants) {

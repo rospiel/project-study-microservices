@@ -48,11 +48,6 @@ public class RestaurantController {
         return ResponseEntity.ok(restaurantService.search(restaurantName, freightRateInitial, freightRateFinal));
     }
 
-    @GetMapping("/findFirst")
-    public ResponseEntity<RestaurantDto> searchFirst() {
-        return ResponseEntity.ok(restaurantService.searchFirst());
-    }
-
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(CREATED)
     public void include(@RequestBody @Valid RestaurantDto restaurant) {

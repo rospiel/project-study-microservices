@@ -10,7 +10,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @SpringBootApplication
 // @EnableEurekaClient
 @EnableDiscoveryClient
-@EnableJpaRepositories(repositoryBaseClass = CustomJpaRepositoryImpl.class)
 public class StudyApplication {
 
 	public static void main(String[] args) {
