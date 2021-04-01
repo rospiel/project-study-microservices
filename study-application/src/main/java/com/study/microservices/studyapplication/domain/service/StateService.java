@@ -7,6 +7,7 @@ import com.study.microservices.studyapplication.domain.repository.StateRepositor
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -33,16 +34,19 @@ public class StateService {
         return new StateDto(state.getId(), state.getName());
     }
 
+    @Transactional
     public StateDto save(StateDto stateDto) {
         return convertEntityToDto(stateRepository.save(convertDtoToEntity(stateDto)));
     }
 
+    @Transactional
     public StateDto update(StateDto stateDto, Long stateId) {
         State stateActual = findById(stateId);
         updateObjectState(stateDto, stateActual);
         return convertEntityToDto(stateRepository.save(stateActual));
     }
 
+    @Transactional
     public void delete(Long stateId) {
         stateRepository.delete(findById(stateId));
     }

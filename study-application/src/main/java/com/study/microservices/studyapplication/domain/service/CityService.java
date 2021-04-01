@@ -9,6 +9,7 @@ import com.study.microservices.studyapplication.domain.repository.CityRepository
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -33,11 +34,13 @@ public class CityService {
         return convertEntityToDto(findById(cityId));
     }
 
+    @Transactional
     public CityDto save(CityDto cityDto) {
         stateService.findById(cityDto.getState().getId());
         return convertEntityToDto(cityRepository.save(this.convertDtoToEntity(cityDto)));
     }
 
+    @Transactional
     public CityDto update(CityDto cityDto, Long cityId) {
         if (nonNull(cityDto.getState()) && nonNull(cityDto.getState().getId())) {
             stateService.findById(cityDto.getState().getId());
@@ -48,6 +51,7 @@ public class CityService {
         return convertEntityToDto(cityRepository.save(cityActual));
     }
 
+    @Transactional
     public void delete(Long cityId) {
         City city = this.findById(cityId);
         if (nonNull(city.getState())) {

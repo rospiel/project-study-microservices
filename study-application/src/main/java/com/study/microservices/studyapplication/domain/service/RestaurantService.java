@@ -9,6 +9,7 @@ import com.study.microservices.studyapplication.core.validation.ValidationExcept
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.SmartValidator;
 
@@ -41,11 +42,13 @@ public class RestaurantService {
         return convertEntityToDto(findById(restaurantId));
     }
 
+    @Transactional
     public RestaurantDto save(RestaurantDto restaurant) {
         kitchenService.searchById(restaurant.getKitchen().getId());
         return convertEntityToDto(restaurantRepository.save(convertDtoToEntity(restaurant)));
     }
 
+    @Transactional
     public RestaurantDto update(RestaurantDto restaurant, Long restaurantId) {
         if (nonNull(restaurant.getKitchen())) {
             kitchenService.searchById(restaurant.getKitchen().getId());
@@ -56,6 +59,7 @@ public class RestaurantService {
         return convertEntityToDto(restaurantRepository.save(restaurantActual));
     }
 
+    @Transactional
     public RestaurantDto partialUpdate(Map<String, Object> fields, Long restaurantId) {
         fields.entrySet()
                 .stream()

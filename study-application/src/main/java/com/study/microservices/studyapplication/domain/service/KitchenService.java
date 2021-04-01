@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -30,16 +31,19 @@ public class KitchenService {
     @Autowired
     private RestaurantService restaurantService;
 
+    @Transactional
     public KitchenDto save(KitchenDto kitchen) {
         return convertEntityToDto(kitchenRepository.save(convertDtoToEntity(kitchen)));
     }
 
+    @Transactional
     public Kitchen update(KitchenDto kitchen, Long kitchenId) {
         Kitchen kitchenBase = kitchenRepository.findById(kitchenId).orElseThrow(() -> new EmptyResultDataAccessException(kitchenId.intValue()));
         copyProperties(kitchen, kitchenBase, "id");
         return kitchenRepository.save(kitchenBase);
     }
 
+    @Transactional
     public void delete(Long kitchenId) {
         if(restaurantService.searchByKitchen(kitchenId).get().isEmpty() == FALSE) {
             String MESSAGE_ERROR = "There is/are restaurant(s) associate a kitchen of id.: %s";
