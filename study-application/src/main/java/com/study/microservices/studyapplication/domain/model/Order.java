@@ -14,7 +14,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,16 +42,16 @@ public class Order {
 
     @CreationTimestamp
     @Column(nullable = false, columnDefinition = "datetime")
-    private LocalDateTime dateCreate;
+    private OffsetDateTime dateCreate;
 
     @Column(nullable = false, columnDefinition = "datetime")
-    private LocalDateTime dateConfirmation;
+    private OffsetDateTime dateConfirmation;
 
     @Column(nullable = false, columnDefinition = "datetime")
-    private LocalDateTime dateCancellation;
+    private OffsetDateTime dateCancellation;
 
     @Column(nullable = false, columnDefinition = "datetime")
-    private LocalDateTime dateDeliver;
+    private OffsetDateTime dateDeliver;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "payment_method_id", nullable = false)
