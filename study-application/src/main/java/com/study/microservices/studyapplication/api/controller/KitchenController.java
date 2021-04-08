@@ -1,9 +1,11 @@
 package com.study.microservices.studyapplication.api.controller;
 
 import com.study.microservices.studyapplication.api.controller.model.KitchensXmlWrapper;
+import com.study.microservices.studyapplication.api.controller.model.request.KitchensRequest;
 import com.study.microservices.studyapplication.domain.dto.KitchenDto;
-import com.study.microservices.studyapplication.domain.model.Kitchen;
 import com.study.microservices.studyapplication.domain.service.KitchenService;
+import com.study.microservices.studyapplication.domain.service.kafka.KafkaReceive;
+import com.study.microservices.studyapplication.domain.service.kafka.KafkaSend;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +36,8 @@ public class KitchenController {
 
     private static final String BY_ID = "/{kitchenId}";
     private final KitchenService kitchenService;
+    private final KafkaSend kafkaSend;
+    private final KafkaReceive kafkaReceive;
 
     @GetMapping
     public List<KitchenDto> list() {
@@ -60,6 +64,18 @@ public class KitchenController {
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     public void include(@RequestBody @Valid KitchenDto kitchen) {
         kitchenService.save(kitchen);
+    }
+
+    @ResponseStatus(CREATED)
+    @PostMapping(path = "/sendKitchensKafka", consumes = APPLICATION_JSON_VALUE)
+    public void include(@RequestBody @Valid KitchensRequest request) {
+        kafkaSend.sendKitchens(request);
+    }
+
+    @ResponseStatus(CREATED)
+    @PostMapping(path = "/consumeKitchensKafka", consumes = APPLICATION_JSON_VALUE)
+    public void include() {
+        kafkaReceive.receiveKitchens();
     }
 
     @PutMapping(value = BY_ID, consumes = APPLICATION_JSON_VALUE)

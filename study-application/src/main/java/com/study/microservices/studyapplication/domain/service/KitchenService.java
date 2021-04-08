@@ -37,6 +37,11 @@ public class KitchenService {
     }
 
     @Transactional
+    public void saveAll(List<KitchenDto> kitchens) {
+        kitchenRepository.saveAll(convertDtoToEntity(kitchens));
+    }
+
+    @Transactional
     public Kitchen update(KitchenDto kitchen, Long kitchenId) {
         Kitchen kitchenBase = kitchenRepository.findById(kitchenId).orElseThrow(() -> new EmptyResultDataAccessException(kitchenId.intValue()));
         copyProperties(kitchen, kitchenBase, "id");
@@ -86,5 +91,11 @@ public class KitchenService {
         return nonNull(kitchenDto) ?
                 new Kitchen(kitchenDto.getId(), kitchenDto.getName()) : null;
 
+    }
+
+    private List<Kitchen> convertDtoToEntity(List<KitchenDto> kitchens) {
+        return kitchens.stream()
+                .map(KitchenService::convertDtoToEntity)
+                .collect(toList());
     }
 }
