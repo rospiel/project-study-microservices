@@ -2,6 +2,7 @@ package com.study.microservices.studyapplication.api.controller;
 
 import com.study.microservices.studyapplication.api.controller.model.KitchensXmlWrapper;
 import com.study.microservices.studyapplication.api.controller.model.request.KitchensRequest;
+import com.study.microservices.studyapplication.core.security.Security;
 import com.study.microservices.studyapplication.domain.dto.KitchenDto;
 import com.study.microservices.studyapplication.domain.service.KitchenService;
 import com.study.microservices.studyapplication.domain.service.kafka.KafkaReceive;
@@ -9,6 +10,7 @@ import com.study.microservices.studyapplication.domain.service.kafka.KafkaSend;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -60,6 +62,7 @@ public class KitchenController {
         return ResponseEntity.ok(kitchenService.searchById(kitchenId));
     }
 
+    @Security.Kitchens.CanInsert
     @ResponseStatus(CREATED)
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     public void include(@RequestBody @Valid KitchenDto kitchen) {
@@ -78,12 +81,15 @@ public class KitchenController {
         kafkaReceive.receiveKitchens();
     }
 
+    @Security.Kitchens.CanUpdate
     @PutMapping(value = BY_ID, consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(NO_CONTENT)
     public void update(@RequestBody @Valid KitchenDto kitchen, @PathVariable Long kitchenId) {
         kitchenService.update(kitchen, kitchenId);
     }
 
+
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping(BY_ID)
     @ResponseStatus(NO_CONTENT) /* Just in case of success*/
     public void delete(@PathVariable long kitchenId) {

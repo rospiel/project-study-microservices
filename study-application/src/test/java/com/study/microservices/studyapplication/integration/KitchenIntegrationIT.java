@@ -1,11 +1,17 @@
 package com.study.microservices.studyapplication.integration;
 
+import com.study.microservices.studyapplication.api.controller.model.request.restaurant.AddressRequest;
+import com.study.microservices.studyapplication.api.controller.model.request.restaurant.RestaurantRequest;
+import com.study.microservices.studyapplication.api.controller.model.response.restaurant.RestaurantResponse;
+import com.study.microservices.studyapplication.domain.dto.CityDto;
 import com.study.microservices.studyapplication.domain.dto.KitchenDto;
-import com.study.microservices.studyapplication.domain.dto.RestaurantDto;
+import com.study.microservices.studyapplication.domain.dto.StateDto;
 import com.study.microservices.studyapplication.domain.exception.EntityAlreadyInUseException;
 import com.study.microservices.studyapplication.domain.exception.UnprocessableEntityException;
+import com.study.microservices.studyapplication.domain.service.CityService;
 import com.study.microservices.studyapplication.domain.service.KitchenService;
 import com.study.microservices.studyapplication.domain.service.RestaurantService;
+import com.study.microservices.studyapplication.domain.service.StateService;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,6 +43,12 @@ public class KitchenIntegrationIT {
     private RestaurantService restaurantService;
 
     @Autowired
+    private CityService cityService;
+
+    @Autowired
+    private StateService stateService;
+
+    @Autowired
     private DatabaseCleaner cleaner;
 
     @Before
@@ -63,8 +75,18 @@ public class KitchenIntegrationIT {
     @Test
     public void testDeleteKitchenInUseNotAllow() {
         KitchenDto kitchenSaved = service.save(new KitchenDto(null, "Mexican"));
-        RestaurantDto restaurantSaved = restaurantService.save(new RestaurantDto(null,
-                "São Paulo", NumberUtils.createBigDecimal("6"), kitchenSaved));
+        StateDto stateDto = stateService.save(new StateDto(null, "stateName"));
+        CityDto cityDto = cityService.save(new CityDto(null, "cityName", stateDto));
+
+        AddressRequest addressRequest = new AddressRequest();
+        addressRequest.setCityId(cityDto.getId());
+        addressRequest.setComplement("");
+        addressRequest.setNeighborhood("Baltimore");
+        addressRequest.setNumber("7");
+        addressRequest.setStreet("3612  Five Points");
+        addressRequest.setZipCode("21202");
+        restaurantService.save(new RestaurantRequest("São Paulo",
+                NumberUtils.createBigDecimal("6"), kitchenSaved.getId(), addressRequest));
 
 
         assertThatThrownBy(() -> service.delete(kitchenSaved.getId()))

@@ -1,5 +1,7 @@
 package com.study.microservices.studyapplication.domain.model;
 
+import com.googlecode.jmapper.annotations.JGlobalMap;
+import com.googlecode.jmapper.annotations.JMap;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -16,6 +18,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.Embedded;
+import javax.persistence.PrePersist;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -26,7 +29,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+import static java.util.UUID.randomUUID;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
@@ -40,6 +47,10 @@ public class  Restaurant {
     @GeneratedValue(strategy = IDENTITY)
     @EqualsAndHashCode.Include
     private Long id;
+
+    @Column(nullable = false)
+    @NotBlank
+    private String code;
 
     /* by default the length is 255*/
     @Column(nullable = false)
@@ -62,11 +73,11 @@ public class  Restaurant {
                inverseJoinColumns = @JoinColumn(name = "payment_method_id"))
     private Set<PaymentMethod> paymentMethods = new HashSet<>();
 
-    @OneToMany(mappedBy = "restaurant")
-    private List<Product> products = new ArrayList<>();
-
     @Embedded
     private Address address;
+
+    @Column(nullable = false)
+    private Boolean enable = TRUE;
 
     @CreationTimestamp
     @Column(nullable = false, columnDefinition = "datetime")
@@ -84,5 +95,15 @@ public class  Restaurant {
         this.name = name;
         this.freightRate = freightRate;
         this.kitchen = kitchen;
+    }
+
+    public Restaurant(Long id, Set<PaymentMethod> paymentMethods) {
+        this.id = id;
+        this.paymentMethods = paymentMethods;
+    }
+
+    @PrePersist
+    private void generateCode() {
+        setCode(randomUUID().toString());
     }
 }

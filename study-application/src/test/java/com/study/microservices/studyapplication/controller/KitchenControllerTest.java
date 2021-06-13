@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.microservices.studyapplication.api.controller.KitchenController;
 import com.study.microservices.studyapplication.domain.dto.KitchenDto;
 import com.study.microservices.studyapplication.domain.service.KitchenService;
+import com.study.microservices.studyapplication.domain.service.kafka.KafkaReceive;
+import com.study.microservices.studyapplication.domain.service.kafka.KafkaSend;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,12 @@ public class KitchenControllerTest {
 
     @MockBean
     private KitchenService service;
+
+    @MockBean
+    private KafkaSend kafkaSend;
+
+    @MockBean
+    private KafkaReceive kafkaReceive;
 
     @Autowired
     private MockMvc mockMvc;

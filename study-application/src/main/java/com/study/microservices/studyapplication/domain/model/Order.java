@@ -7,6 +7,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -18,6 +20,7 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
@@ -68,9 +71,10 @@ public class Order {
     @Embedded
     private Address addressDeliver;
 
+    @Enumerated(EnumType.STRING)
     private EnumStatusOrder statusOrder;
 
-    @OneToMany(fetch = LAZY, mappedBy = "order")
+    @OneToMany(fetch = LAZY, mappedBy = "order", cascade = ALL)
     private List<ItemOrder> itemOrders = new ArrayList<>();
 
 }

@@ -1,5 +1,6 @@
 package com.study.microservices.studyapplication.domain.service;
 
+import com.study.microservices.studyapplication.core.jmapper.KitchenConverter;
 import com.study.microservices.studyapplication.domain.dto.KitchenDto;
 import com.study.microservices.studyapplication.domain.exception.EntityAlreadyInUseException;
 import com.study.microservices.studyapplication.domain.exception.UnprocessableEntityException;
@@ -31,14 +32,17 @@ public class KitchenService {
     @Autowired
     private RestaurantService restaurantService;
 
+    @Autowired
+    private KitchenConverter converter;
+
     @Transactional
     public KitchenDto save(KitchenDto kitchen) {
-        return convertEntityToDto(kitchenRepository.save(convertDtoToEntity(kitchen)));
+        return converter.convert(kitchenRepository.save(converter.convert(kitchen)));
     }
 
     @Transactional
     public void saveAll(List<KitchenDto> kitchens) {
-        kitchenRepository.saveAll(convertDtoToEntity(kitchens));
+        kitchenRepository.saveAll(converter.convertListKitchen(kitchens));
     }
 
     @Transactional
@@ -58,44 +62,20 @@ public class KitchenService {
     }
 
     public List<KitchenDto> findAll() {
-        return convertEntityToDto(kitchenRepository.findAll());
+        return converter.convertListKitchenDto(kitchenRepository.findAll());
     }
 
     public KitchenDto searchById(Long kitchenId) {
-        return convertEntityToDto(findById(kitchenId));
+        return converter.convert(findById(kitchenId));
     }
 
     public List<KitchenDto> findByName(String kitchenName) {
-        return convertEntityToDto(kitchenRepository.findByName(kitchenName).orElseThrow(()
+        return converter.convertListKitchenDto(kitchenRepository.findByName(kitchenName).orElseThrow(()
                 -> new UnprocessableEntityException(format("Kitchen of name %s not found.", kitchenName))));
     }
 
     private Kitchen findById(Long kitchenId) {
         return kitchenRepository.findById(kitchenId).orElseThrow(()
                 -> new UnprocessableEntityException("Kitchen of id %s not found.", kitchenId));
-    }
-
-    private List<KitchenDto> convertEntityToDto(List<Kitchen> kitchens) {
-        return kitchens.stream()
-                .map(KitchenService::convertEntityToDto)
-                .collect(toList());
-    }
-
-    public static KitchenDto convertEntityToDto(Kitchen kitchen) {
-        return nonNull(kitchen) ?
-                new KitchenDto(kitchen.getId(), kitchen.getName()) :
-                null;
-    }
-
-    public static Kitchen convertDtoToEntity(KitchenDto kitchenDto) {
-        return nonNull(kitchenDto) ?
-                new Kitchen(kitchenDto.getId(), kitchenDto.getName()) : null;
-
-    }
-
-    private List<Kitchen> convertDtoToEntity(List<KitchenDto> kitchens) {
-        return kitchens.stream()
-                .map(KitchenService::convertDtoToEntity)
-                .collect(toList());
     }
 }

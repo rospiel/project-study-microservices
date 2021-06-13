@@ -48,7 +48,7 @@ public class KitchenServiceTest {
         when(repository.findById(KITCHEN_ID)).thenReturn(Optional.of(new Kitchen()));
         service.delete(KITCHEN_ID);
 
-        verify(restaurantService, times(3)).searchByKitchen(anyLong());
+        verify(restaurantService).searchByKitchen(anyLong());
         verify(repository).findById(anyLong());
         verify(repository).delete(any(Kitchen.class));
     }

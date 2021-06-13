@@ -1,13 +1,19 @@
 package com.study.microservices.studyapplication.domain.service;
 
+import com.study.microservices.studyapplication.api.controller.model.response.city.CityResponse;
+import com.study.microservices.studyapplication.api.controller.model.response.city.CityStateResponse;
 import com.study.microservices.studyapplication.domain.dto.CityDto;
+import com.study.microservices.studyapplication.domain.dto.StateDto;
 import com.study.microservices.studyapplication.domain.exception.EntityAlreadyInUseException;
 import com.study.microservices.studyapplication.domain.exception.UnprocessableEntityException;
 import com.study.microservices.studyapplication.domain.model.City;
 import com.study.microservices.studyapplication.domain.model.State;
 import com.study.microservices.studyapplication.domain.repository.CityRepository;
+import com.study.microservices.studyapplication.domain.service.event.PostedCityEvent;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.AbstractAggregateRoot;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +31,7 @@ public class CityService {
 
     private final CityRepository cityRepository;
     private final StateService stateService;
+    private final ApplicationEventPublisher publisher;
 
     public List<CityDto> findAll() {
         return this.convertEntityToDto(cityRepository.findAll());
@@ -34,10 +41,17 @@ public class CityService {
         return convertEntityToDto(findById(cityId));
     }
 
+    public CityResponse searchByIdFilterResult(Long cityId) {
+        return buildCityResponse(findById(cityId));
+    }
+
     @Transactional
     public CityDto save(CityDto cityDto) {
         stateService.findById(cityDto.getState().getId());
-        return convertEntityToDto(cityRepository.save(this.convertDtoToEntity(cityDto)));
+        CityDto dto = convertEntityToDto(cityRepository.save(this.convertDtoToEntity(cityDto)));
+        publisher.publishEvent(new PostedCityEvent(dto));
+
+        return dto;
     }
 
     @Transactional
@@ -94,6 +108,22 @@ public class CityService {
 
     private City findById(Long cityId) {
         return cityRepository.findById(cityId).orElseThrow(() ->
-                new UnprocessableEntityException("City of name %s not found.", cityId));
+                new UnprocessableEntityException("City of id %s not found.", cityId));
+    }
+
+    private CityResponse buildCityResponse(City entity) {
+        if (isNull(entity)) {
+            return new CityResponse();
+        }
+
+        return new CityResponse(entity.getId(), entity.getName(), buildCityStateResponse(entity.getState()));
+    }
+
+    private CityStateResponse buildCityStateResponse(State entity) {
+        if (isNull(entity)) {
+            return new CityStateResponse();
+        }
+
+        return new CityStateResponse(entity.getId(), entity.getName());
     }
 }

@@ -15,4 +15,8 @@ public class UnprocessableEntityException extends RuntimeException {
     public UnprocessableEntityException(String message, Long entityId) {
         super(format(message, entityId));
     }
+
+    public UnprocessableEntityException(String message, String entityCode) {
+        super(format(message, entityCode));
+    }
 }
