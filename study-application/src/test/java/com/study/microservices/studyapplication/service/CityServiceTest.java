@@ -52,6 +52,6 @@ public class CityServiceTest {
         cityService.save(dto);
 
         verify(applicationEventPublisher).publishEvent(acApplicationEventPublisher.capture());
-        assertEquals(dto.getName(), acApplicationEventPublisher.getValue().getCity().getName() + "oie");
+        assertEquals(dto.getName(), acApplicationEventPublisher.getValue().getCity().getName());
     }
 }

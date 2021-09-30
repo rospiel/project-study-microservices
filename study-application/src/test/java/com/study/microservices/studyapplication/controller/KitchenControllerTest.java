@@ -9,18 +9,20 @@ import com.study.microservices.studyapplication.domain.service.kafka.KafkaSend;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import java.util.List;
 
+import static org.apache.commons.lang.CharEncoding.UTF_8;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -31,7 +33,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(KitchenController.class)
+@WebMvcTest(value = KitchenController.class, useDefaultFilters = false)
+@Import({KitchenController.class})
+@AutoConfigureMockMvc(addFilters = false)
+@WithMockUser
 public class KitchenControllerTest {
 
     @MockBean
@@ -55,6 +60,7 @@ public class KitchenControllerTest {
     public void testInsertKitchenHttp201() throws Exception {
         mockMvc.perform(post(URL)
                 .content(mapper.writeValueAsString(new KitchenDto(null, "Indian")))
+                .characterEncoding(UTF_8)
                 .contentType(APPLICATION_JSON_VALUE))
                 .andExpect(status().isCreated());
 
@@ -65,6 +71,7 @@ public class KitchenControllerTest {
     public void testInsertKitchenEmptyNameHttp400() throws Exception {
         mockMvc.perform(post(URL)
                 .content(mapper.writeValueAsString(new KitchenDto(null, "")))
+                .characterEncoding(UTF_8)
                 .contentType(APPLICATION_JSON_VALUE))
                 .andExpect(status().isBadRequest());
 

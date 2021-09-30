@@ -73,7 +73,7 @@ public class MailConfig {
     }
 
     @Bean
-    private AuditorAware<String> auditorProvider() {
+    public AuditorAware<String> auditorProvider() {
         return new UsernameAuditorAware();
     }
 }

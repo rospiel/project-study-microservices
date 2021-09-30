@@ -1,4 +1,5 @@
 HELP.md
+config-server/
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**
@@ -78,7 +79,7 @@ buildNumber.properties
 # .idea/modules.xml
 # .idea/*.iml
 # .idea/modules
-# *.iml
+*.iml
 # *.ipr
 
 # CMake

@@ -18,6 +18,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import com.study.microservices.studyapplication.util.DatabaseCleaner;
@@ -34,6 +35,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /* to use features from spring in our tests */
 @SpringBootTest
 @TestPropertySource(properties = { "spring.config.location=classpath:application-test.yml" })
+@WithMockUser
 public class KitchenIntegrationIT {
 
     @Autowired

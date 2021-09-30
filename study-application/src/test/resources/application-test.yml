@@ -2,8 +2,45 @@ spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     platform: mysql
-    url: jdbc:mysql://localhost:3306/studyapplication_test?createDatabaseIfNotExist=true&serverTimezone=UTC&characterEncoding=UTF-8
+    url: jdbc:mysql://127.0.0.1:3306/studyapplication_test?createDatabaseIfNotExist=true&serverTimezone=UTC&characterEncoding=UTF-8
     username: root
     password: 'admin'
     hikari:
       maximum-pool-size: 1
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://keycloak:8080/auth/realms/studyapplication #keycloak
+
+  mail:
+    sendgrid:
+      host: smtp.sendgrid.net
+      port: 587
+      username: apikey
+      password: ~
+      sender: StudyApplication <notreply@studyapplication.com.br>
+    gmail:
+      host: smtp.gmail.com
+      port: 587
+      username: ~
+      password: ~
+      protocol: smtp
+      properties-mail-smtp-auth: true
+      properties-mail-smtp-starttls-enable: true
+      properties-mail-smtp-ssl-trust: smtp.gmail.com
+
+studyapplication:
+  storage:
+    storageType: local
+    local:
+      photos: /home/rodrigo/Pictures/study
+    s3:
+      access-key: ~
+      access-secret: ~
+      bucket: studyapplication-test
+      region: us-east-1
+      directory: files
+  mail:
+    service: gmail

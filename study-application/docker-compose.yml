@@ -1,0 +1,52 @@
+version: "3.9"
+
+networks:
+  studyapplication-net:
+    driver: bridge
+
+services:
+  microservicesdb:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: "admin"
+      MYSQL_USER: "admin"
+      MYSQL_PASSWORD: "admin"
+      MYSQL_DATABASE: "microservices"
+    ports:
+      - "3306:3306"
+    networks:
+      - studyapplication-net
+
+  configserver:
+    image: configserver
+    ports:
+    - "9090:9090"
+    networks:
+      - studyapplication-net
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:15.0.1
+    environment:
+      KEYCLOAK_USER: "admin"
+      KEYCLOAK_PASSWORD: "admin"
+    ports:
+    - "8080:8080"
+    networks:
+      - studyapplication-net
+
+  studyapplication:
+    image: rospiel/studyapplication
+    command: ["/wait-for-it.sh", "-t", "30", "keycloak:8080",
+              "--", "java", "-jar", "api.jar"]
+
+    ports:
+      - "7070:8080"
+    networks:
+      - studyapplication-net
+    depends_on:
+      - configserver
+      - keycloak
+      - microservicesdb
+
+    #deploy:
+      #replicas: 2

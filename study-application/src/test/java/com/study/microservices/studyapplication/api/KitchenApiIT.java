@@ -7,6 +7,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,12 @@ public class KitchenApiIT {
     private RestaurantService restaurantService;
 
     private List<KitchenDto> kitchens = new ArrayList<>();
+    private static String TOKEN;
+
+    @BeforeClass
+    public static void setupToken() {
+        getToken();
+    }
 
     @Before
     public void setup() {
@@ -64,6 +71,7 @@ public class KitchenApiIT {
     @Test
     public void testGetAllKitchenHttp200() {
         given().accept(ContentType.JSON)
+                .auth().oauth2(TOKEN)
                 .when()
                 .get()
                 .then()
@@ -74,6 +82,7 @@ public class KitchenApiIT {
     public void testGetKitchenByIdHttp200() {
         given().pathParam("kitchenId", kitchens.get(0).getId())
                 .accept(ContentType.JSON)
+                .auth().oauth2(TOKEN)
                 .when()
                 .get("/{kitchenId}")
                 .then()
@@ -88,6 +97,7 @@ public class KitchenApiIT {
 
         given().pathParam("kitchenId", kitchenIdNonexistent)
                 .accept(ContentType.JSON)
+                .auth().oauth2(TOKEN)
                 .when()
                 .get("/{kitchenId}")
                 .then()
@@ -100,6 +110,7 @@ public class KitchenApiIT {
     public void testInsertKitchenHttp201() {
         /* body receive a entity and the process convert to json */
         given().body(new KitchenDto(null, "Indian"))
+                .auth().oauth2(TOKEN)
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
                 .when()
@@ -111,5 +122,20 @@ public class KitchenApiIT {
     private void setupDataBase() {
         kitchens.add(service.save(new KitchenDto(null, "American")));
         kitchens.add(service.save(new KitchenDto(null, "Arabic")));
+    }
+
+    private static void getToken() {
+        TOKEN = given().contentType("application/x-www-form-urlencoded; charset=utf-8")
+                .formParam("password", "rodrigo")
+                .formParam("username", "rodrigo")
+                .formParam("client_id", "studyapplication_password")
+                .formParam("grant_type", "password")
+                .when()
+                .post("http://keycloak:8080/auth/realms/studyapplication/protocol/openid-connect/token")
+                .then()
+                .extract()
+                .response()
+                .jsonPath()
+                .get("access_token");
     }
 }
